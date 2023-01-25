@@ -14,28 +14,23 @@ Notifications.setNotificationHandler({
 
 const App: React.FC = () => {
   const [expoPushToken, setExpoPushToken] = useState<string>("");
-  const [notification, setNotification] = useState(null);
-  const notificationListener = useRef(null);
-  const responseListener = useRef(null);
+  const [notification, setNotification] = useState<Notifications.Notification | null>(null);
+  const notificationListener = useRef<any>(null);
+  const responseListener = useRef<any>(null);
 
   useEffect(() => {
-    registerForPushNotificationsAsync().then(token => setExpoPushToken(token ?? ""));
+    registerForPushNotifications().then(token => setExpoPushToken(token ?? ""));
 
-    // @ts-ignore
     notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-      // @ts-ignore
       setNotification(notification);
     });
 
-    // @ts-ignore
     responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
       console.log(response);
     });
 
     return () => {
-      // @ts-ignore
       Notifications.removeNotificationSubscription(notificationListener.current);
-      // @ts-ignore
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
@@ -61,15 +56,15 @@ const App: React.FC = () => {
       <Text>
         Token: {expoPushToken ?? "none"}
       </Text>
-      <View style={{flexDirection: "row"}}>
-        <View style={{margin: 4}}>
+      <View style={{ flexDirection: "row" }}>
+        <View style={{ margin: 4 }}>
           <Button
             title={"send"}
             onPress={handleSendNotification}
             disabled={!expoPushToken || !!notification}
           />
         </View>
-        <View style={{margin: 4}}>
+        <View style={{ margin: 4 }}>
           <Button
             title={"clear"}
             onPress={() => setNotification(null)}
@@ -87,7 +82,7 @@ const App: React.FC = () => {
 
 export default App;
 
-async function registerForPushNotificationsAsync() {
+const registerForPushNotifications = async () => {
   let token;
 
   if (Platform.OS === "android") {
