@@ -1,0 +1,14 @@
+.DS_Store
+/node_modules
+*-lock.*
+*.lock
+*.log
+
+/dist
+
+# ide
+.idea
+.vscode
+
+# other
+.env
