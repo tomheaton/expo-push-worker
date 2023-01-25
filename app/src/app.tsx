@@ -1,8 +1,8 @@
 import React, { useEffect, useRef, useState } from "react";
-import { StatusBar } from "expo-status-bar";
-import { Platform, StyleSheet, Text, View } from "react-native";
+import { Button, Platform, Text, View } from "react-native";
 import * as Device from "expo-device";
 import * as Notifications from "expo-notifications";
+import Constants from "expo-constants";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -14,7 +14,7 @@ Notifications.setNotificationHandler({
 
 const App: React.FC = () => {
   const [expoPushToken, setExpoPushToken] = useState<string>("");
-  const [notification, setNotification] = useState();
+  const [notification, setNotification] = useState(null);
   const notificationListener = useRef(null);
   const responseListener = useRef(null);
 
@@ -39,38 +39,53 @@ const App: React.FC = () => {
       Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
+
+  const handleSendNotification = async () => {
+    const localhost = Constants.manifest?.debuggerHost?.split(":").shift();
+    if (!localhost) {
+      throw new Error("Failed to get localhost, configure it manually!");
+    }
+
+    await fetch(`http://${localhost}:3001/send`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ token: expoPushToken }),
+    });
+  };
+
   return (
-    <View style={styles.container}>
-      <StatusBar style="auto" />
+    <View style={{ flex: 1, alignItems: "center", justifyContent: "center" }}>
       <Text>expo-push-worker</Text>
       <Text>
-        Token: {expoPushToken ?? "No token"}
+        Token: {expoPushToken ?? "none"}
+      </Text>
+      <View style={{flexDirection: "row"}}>
+        <View style={{margin: 4}}>
+          <Button
+            title={"send"}
+            onPress={handleSendNotification}
+            disabled={!expoPushToken || !!notification}
+          />
+        </View>
+        <View style={{margin: 4}}>
+          <Button
+            title={"clear"}
+            onPress={() => setNotification(null)}
+            disabled={!notification}
+            color={"red"}
+          />
+        </View>
+      </View>
+      <Text>
+        Notification: {notification ? JSON.stringify(notification, null, 2) : "none"}
       </Text>
     </View>
   );
 };
 
 export default App;
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-});
-
-async function schedulePushNotification() {
-  await Notifications.scheduleNotificationAsync({
-    content: {
-      title: "You've got mail! 📬",
-      body: "Here is the notification body",
-      data: { data: "goes here" },
-    },
-    trigger: { seconds: 2 },
-  });
-}
 
 async function registerForPushNotificationsAsync() {
   let token;

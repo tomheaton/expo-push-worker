@@ -4,6 +4,5 @@ compatibility_date = "2022-05-03"
 # TODO: check https://github.com/ionic-team/rollup-plugin-node-polyfills/ for polyfills
 node_compat = true
 
-# use .dev.env for development
-[env.development]
-ENVFILE = ".dev.env"
+[vars]
+EXPO_ACCESS_TOKEN = ""
