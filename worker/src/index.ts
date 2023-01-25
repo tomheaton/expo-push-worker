@@ -2,7 +2,6 @@ import { Expo, type ExpoPushMessage } from "expo-server-sdk";
 
 type EnvType = {
   EXPO_ACCESS_TOKEN: string;
-  DEVICE_TOKEN: string;
 }
 
 export default {
