@@ -5,3 +5,6 @@
 *.log
 
 /dist
+
+.dev.env
+.env

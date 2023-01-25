@@ -14,24 +14,29 @@ Notifications.setNotificationHandler({
 
 const App: React.FC = () => {
   const [expoPushToken, setExpoPushToken] = useState<string>("");
-  const [notification, setNotification] = useState<Notification>();
-  const notificationListener = useRef<PushSubscription>(null);
+  const [notification, setNotification] = useState();
+  const notificationListener = useRef(null);
   const responseListener = useRef(null);
 
   useEffect(() => {
     registerForPushNotificationsAsync().then(token => setExpoPushToken(token ?? ""));
 
-    // notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
-    //   setNotification(notification);
-    // });
+    // @ts-ignore
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      // @ts-ignore
+      setNotification(notification);
+    });
 
-    // responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
-    //   console.log(response);
-    // });
+    // @ts-ignore
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
 
     return () => {
-      // Notifications.removeNotificationSubscription(notificationListener.current);
-      // Notifications.removeNotificationSubscription(responseListener.current);
+      // @ts-ignore
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      // @ts-ignore
+      Notifications.removeNotificationSubscription(responseListener.current);
     };
   }, []);
   return (
